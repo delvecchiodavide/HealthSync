@@ -1,0 +1,9 @@
+// Shared build settings. Put your own values in Secrets.xcconfig (not committed).
+// See Secrets.example.xcconfig and the README.
+
+APP_BUNDLE_ID = com.example.healthsync
+APP_DEVELOPMENT_TEAM =
+GOOGLE_CLIENT_ID =
+GOOGLE_REVERSED_CLIENT_ID =
+
+#include? "Secrets.xcconfig"

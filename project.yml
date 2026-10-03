@@ -1,0 +1,82 @@
+name: HealthSync
+options:
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+  developmentLanguage: en
+
+configFiles:
+  Debug: Config/HealthSync.xcconfig
+  Release: Config/HealthSync.xcconfig
+
+packages:
+  GoogleSignIn:
+    url: https://github.com/google/GoogleSignIn-iOS
+    from: 8.0.0
+  HealthSyncKit:
+    path: HealthSyncKit
+
+targets:
+  HealthSync:
+    type: application
+    platform: iOS
+    sources:
+      - HealthSync
+    dependencies:
+      - package: GoogleSignIn
+        product: GoogleSignIn
+      - package: HealthSyncKit
+    entitlements:
+      path: HealthSync/Resources/HealthSync.entitlements
+      properties:
+        com.apple.developer.healthkit: true
+        com.apple.developer.healthkit.background-delivery: true
+    info:
+      path: HealthSync/Resources/Info.plist
+      properties:
+        CFBundleDisplayName: HealthSync
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        UILaunchScreen: {}
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        NSHealthShareUsageDescription: HealthSync reads the Health data you choose and copies it to Google Sheets in your own Google Drive.
+        NSHealthUpdateUsageDescription: HealthSync never writes to Apple Health.
+        UIBackgroundModes:
+          - fetch
+          - processing
+        BGTaskSchedulerPermittedIdentifiers:
+          - com.healthsync.app.refresh
+          - com.healthsync.app.processing
+        GIDClientID: $(GOOGLE_CLIENT_ID)
+        CFBundleURLTypes:
+          - CFBundleURLSchemes:
+              - $(GOOGLE_REVERSED_CLIENT_ID)
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(APP_BUNDLE_ID)
+        DEVELOPMENT_TEAM: $(APP_DEVELOPMENT_TEAM)
+        CODE_SIGN_STYLE: Automatic
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        TARGETED_DEVICE_FAMILY: "1"
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        # The app target uses Swift 5 language mode with concurrency checking, because
+        # GoogleSignIn's Objective-C API isn't annotated for Swift 6. HealthSyncKit builds in Swift 6 mode.
+        SWIFT_VERSION: "5.0"
+        SWIFT_STRICT_CONCURRENCY: targeted
+        ENABLE_USER_SCRIPT_SANDBOXING: YES
+
+schemes:
+  HealthSync:
+    build:
+      targets:
+        HealthSync: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - package: HealthSyncKit/HealthSyncKitTests
