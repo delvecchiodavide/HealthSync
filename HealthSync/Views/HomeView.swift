@@ -27,27 +27,50 @@ struct HomeView: View {
                 LabeledContent("Frequency", value: model.settings.interval.displayText)
                 if let last = model.runs.first {
                     LabeledContent("Last attempt") {
-                        Label(last.status.displayName, systemImage: last.status.symbol)
-                            .foregroundStyle(last.status.tint)
+                        HStack(spacing: 4) {
+                            Image(systemName: last.status.symbol)
+                            Text(last.status.displayName)
+                        }
+                        .foregroundStyle(last.status.tint)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                     }
                 }
+            }
 
-                Button {
-                    Task { await model.sync(trigger: .manual) }
-                } label: {
-                    HStack {
-                        Text(model.isSyncing ? "Syncing…" : "Sync Now")
-                        Spacer()
-                        if model.isSyncing { ProgressView() }
+            Section {
+                VStack(spacing: 14) {
+                    Button {
+                        Task { await model.sync(trigger: .manual) }
+                    } label: {
+                        HStack(spacing: 10) {
+                            if model.isSyncing {
+                                ProgressView().tint(.white)
+                            } else {
+                                Image(systemName: "arrow.triangle.2.circlepath")
+                            }
+                            Text(model.isSyncing ? "Syncing…" : "Sync Now")
+                        }
+                        .font(.title3.weight(.semibold))
+                        .frame(maxWidth: 260)
+                        .padding(.vertical, 6)
                     }
-                }
-                .disabled(model.isSyncing)
+                    .buttonStyle(.borderedProminent)
+                    .buttonBorderShape(.capsule)
+                    .controlSize(.large)
+                    .tint(.pink)
+                    .disabled(model.isSyncing)
 
-                if let folderID = model.settings.folderID {
-                    Link(destination: DriveService.folderURL(id: folderID)) {
-                        Label("Open \(model.settings.folderName ?? "Drive folder")", systemImage: "folder")
+                    if let folderID = model.settings.folderID {
+                        Link(destination: DriveService.folderURL(id: folderID)) {
+                            Label("Open folder in Google Drive", systemImage: "folder")
+                                .font(.subheadline)
+                        }
                     }
                 }
+                .frame(maxWidth: .infinity)
+                .listRowBackground(Color.clear)
+                .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
             }
 
             Section("Data types") {
