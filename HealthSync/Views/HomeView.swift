@@ -73,45 +73,12 @@ struct HomeView: View {
                 .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
             }
 
-            Section("Data types") {
-                ForEach(model.settings.enabledMetrics) { metric in
-                    MetricStatusRow(metric: metric, status: model.metricStatuses[metric.id])
-                }
-            }
-
             Section {
                 SchedulingNote()
             }
         }
         .navigationTitle("HealthSync")
         .refreshable { await model.refresh() }
-    }
-}
-
-private struct MetricStatusRow: View {
-    let metric: HealthMetric
-    let status: MetricStatus?
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack {
-                Text(metric.displayName)
-                Spacer()
-                Text("\(status?.totalRows ?? 0) rows")
-                    .foregroundStyle(.secondary)
-                    .monospacedDigit()
-            }
-            if let error = status?.lastError {
-                Label(error, systemImage: "exclamationmark.triangle")
-                    .font(.caption)
-                    .foregroundStyle(.red)
-            } else if let date = status?.lastSyncAt {
-                Text("Updated \(date, format: .relative(presentation: .named))")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-        }
-        .accessibilityElement(children: .combine)
     }
 }
 

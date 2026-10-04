@@ -28,6 +28,8 @@ struct MainTabView: View {
         TabView {
             NavigationStack { HomeView() }
                 .tabItem { Label("Sync", systemImage: "arrow.triangle.2.circlepath") }
+            NavigationStack { DataView() }
+                .tabItem { Label("Data", systemImage: "heart.text.square") }
             NavigationStack { SyncLogView() }
                 .tabItem { Label("Log", systemImage: "list.bullet.rectangle") }
             NavigationStack { SettingsView() }
