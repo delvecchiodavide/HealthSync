@@ -60,6 +60,21 @@ final class AppModel {
                 set: { on in self.update { if on { $0.enabledMetricIDs.insert(metric.id) } else { $0.enabledMetricIDs.remove(metric.id) } } })
     }
 
+    /// On when every type in the category is enabled; setting it enables or disables them all.
+    func isEnabled(_ category: MetricCategory) -> Binding<Bool> {
+        let ids = Set(category.metrics.map(\.id))
+        return Binding(get: { ids.isSubset(of: self.settings.enabledMetricIDs) },
+                       set: { on in self.update { if on { $0.enabledMetricIDs.formUnion(ids) } else { $0.enabledMetricIDs.subtract(ids) } } })
+    }
+
+    func setAllMetrics(enabled: Bool) {
+        update { $0.enabledMetricIDs = enabled ? Set(HealthMetric.all.map(\.id)) : [] }
+    }
+
+    func enabledCount(in category: MetricCategory) -> Int {
+        category.metrics.filter { settings.enabledMetricIDs.contains($0.id) }.count
+    }
+
     // MARK: Lifecycle
 
     /// Called from `didFinishLaunching`, including background launches.
@@ -153,8 +168,9 @@ final class AppModel {
 
     // MARK: Actions
 
+    /// Asks only for the enabled types; iOS shows its permission sheet just for ones not asked before.
     func requestHealthAuthorization() async throws {
-        try await health.requestAuthorization(for: HealthMetric.all)
+        try await health.requestAuthorization(for: settings.enabledMetrics)
     }
 
     func listFolders() async throws -> [DriveFile] {

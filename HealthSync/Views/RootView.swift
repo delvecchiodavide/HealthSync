@@ -39,7 +39,7 @@ struct MainTabView: View {
 /// Shown wherever scheduling is configured, so expectations match what iOS actually does.
 struct SchedulingNote: View {
     var body: some View {
-        Text("iOS decides exactly when background syncs run, based on battery, usage and network. Health data can't be read while your iPhone is locked, so a sync may wait until you next unlock it. Opening the app always syncs if one is due.")
+        Text("iOS decides exactly when background syncs run, based on battery, usage and network. **Health data can't be read while your iPhone is locked, due to an Apple limitation**, so a sync may wait until you next unlock it. Opening the app always syncs if one is due.")
             .font(.footnote)
             .foregroundStyle(.secondary)
     }

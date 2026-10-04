@@ -30,7 +30,7 @@ public final class HealthKitService: HealthDataSource, @unchecked Sendable {
         switch metric.kind {
         case .quantity(let id, _):
             return [HKQuantityType(HKQuantityTypeIdentifier(rawValue: id))]
-        case .category(let id):
+        case .category(let id), .categoryEvent(let id, _):
             return [HKCategoryType(HKCategoryTypeIdentifier(rawValue: id))]
         case .sleep:
             return [HKCategoryType(.sleepAnalysis)]
@@ -47,7 +47,7 @@ public final class HealthKitService: HealthDataSource, @unchecked Sendable {
     static func observedType(for metric: HealthMetric) -> HKSampleType {
         switch metric.kind {
         case .quantity(let id, _): HKQuantityType(HKQuantityTypeIdentifier(rawValue: id))
-        case .category(let id): HKCategoryType(HKCategoryTypeIdentifier(rawValue: id))
+        case .category(let id), .categoryEvent(let id, _): HKCategoryType(HKCategoryTypeIdentifier(rawValue: id))
         case .sleep: HKCategoryType(.sleepAnalysis)
         case .workout: HKObjectType.workoutType()
         case .bloodPressure: HKQuantityType(.bloodPressureSystolic)
@@ -128,6 +128,17 @@ public final class HealthKitService: HealthDataSource, @unchecked Sendable {
                                             anchor: queryAnchor, limit: limit)
             added = result.added.map { sample in
                 Self.record(sample, values: [.rounded(sample.endDate.timeIntervalSince(sample.startDate) / 60, places: 2), .string("min")])
+            }
+            (deleted, newAnchor) = (result.deleted, result.anchor)
+
+        case .categoryEvent(let id, let valueSet):
+            let result = try await anchored(.categorySample(type: HKCategoryType(HKCategoryTypeIdentifier(rawValue: id)), predicate: predicate),
+                                            anchor: queryAnchor, limit: limit)
+            added = result.added.map { sample in
+                Self.record(sample, values: [
+                    .string(valueSet.label(for: sample.value)),
+                    .rounded(sample.endDate.timeIntervalSince(sample.startDate) / 60, places: 2),
+                ])
             }
             (deleted, newAnchor) = (result.deleted, result.anchor)
 

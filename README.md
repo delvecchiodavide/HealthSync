@@ -24,6 +24,7 @@ An iOS app that reads Apple Health data on the iPhone it runs on and syncs it to
 | Sleep | … end_date, **sleep_stage**, value (min), unit, … |
 | Workouts | … end_date, **activity_type, duration_min, energy_kcal, distance_km, avg_heart_rate_bpm**, … |
 | Blood pressure | … end_date, **systolic_mmHg, diastolic_mmHg**, … |
+| Events, symptoms, cycle tracking | … end_date, **value** (label such as `mild`, `severe`, `positive`, `stood`), **duration_min**, … |
 | Daily Summary | date, steps, active_kcal, resting_hr_bpm, avg_hrv_ms, sleep_hours, weight_kg, workouts, updated_at |
 
 - Dates use ISO 8601 with the UTC offset of the time zone where the sample was recorded.
@@ -50,6 +51,8 @@ HealthSync/
     │   └── Util/               Row mapping, A1 notation, helpers
     └── Tests/                  Unit + end-to-end sync tests against a fake Google API
 ```
+
+There are 174 data types in 11 categories (Activity, Heart, Body Measurements, Vitals, Respiratory, Nutrition, Sleep & Mindfulness, Hearing, Cycle Tracking, Symptoms, Other). In the app you can turn on a whole category or pick single types. A spreadsheet is only created once a type has data.
 
 To add a new data type, add one line to `HealthMetric.all` in `HealthSyncKit/Sources/HealthSyncKit/Models/HealthMetric.swift`.
 
